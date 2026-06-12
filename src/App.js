@@ -1,15 +1,15 @@
 
 import { useState, useEffect } from "react";
 
-const Box = ({ children, color }) => (
+const Box = ({ children, color, darkMode }) => (
   <div
     style={{
-      border: "2px solid black",
+      border: darkMode ? "1px solid #444" : "2px solid black",
       padding: "12px",
       borderRadius: "14px",
       background: color,
       color: "white",
-      minHeight: "100px",
+      minHeight: "120px",
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
@@ -30,6 +30,8 @@ export default function App() {
   const [streak, setStreak] = useState(0);
   const [restingTeam, setRestingTeam] = useState(null);
   const [showList, setShowList] = useState(false);
+
+  const [darkMode, setDarkMode] = useState(false);
 
   const [scoreA, setScoreA] = useState(0);
   const [scoreB, setScoreB] = useState(0);
@@ -141,8 +143,19 @@ export default function App() {
   const ranking = Object.entries(wins).sort((a, b) => b[1] - a[1]);
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>🎾 Reta Frontón</h2>
+    <div
+      style={{
+        padding: 20,
+        background: darkMode ? "#111827" : "white",
+        color: darkMode ? "white" : "black",
+        minHeight: "100vh",
+      }}
+    >
+      <h2 style={{ textAlign: "center" }}>🎾 Reta Frontón</h2>
+
+      <button onClick={() => setDarkMode(!darkMode)}>
+        {darkMode ? "☀️ Claro" : "🌙 Oscuro"}
+      </button>
 
       <h3>🔥 Racha: {streak} / 2</h3>
 
@@ -168,8 +181,8 @@ export default function App() {
         </>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-        <Box color="blue">
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <Box color="#1e40af" darkMode={darkMode}>
           <h3>Equipo A</h3>
           {courts.teamA.map((p, i) => (
             <div key={i}>{p}</div>
@@ -189,7 +202,7 @@ export default function App() {
           </button>
         </Box>
 
-        <Box color="red">
+        <Box color="#991b1b" darkMode={darkMode}>
           <h3>Equipo B</h3>
           {courts.teamB.map((p, i) => (
             <div key={i}>{p}</div>
