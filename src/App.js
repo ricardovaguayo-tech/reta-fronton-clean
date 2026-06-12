@@ -14,6 +14,7 @@ const Box = ({ children, color, darkMode }) => (
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
+      width: "100%"
     }}
   >
     {children}
@@ -107,10 +108,9 @@ export default function App() {
     setScoreB(0);
   };
 
-  // ✅ ✅ LÓGICA CORRECTA
+  // ✅ LÓGICA FINAL CORRECTA
   const winner = (side) => {
     const { teamA, teamB } = courts;
-
     if (teamA.length < 2 || teamB.length < 2) return;
 
     const winTeam = side === "A" ? teamA : teamB;
@@ -118,41 +118,39 @@ export default function App() {
 
     addWin(winTeam);
 
-    // 🔥 eliminar perdedores y meterlos al final
     let pool = [...waiting, ...loseTeam];
 
-    // 🔥 si había equipo descansando → regresa primero
+    // 👉 si regresan del descanso → reinician racha
+    let newStreak = restingTeam ? 1 : streak + 1;
+
     if (restingTeam) {
       pool = [...restingTeam, ...pool];
       setRestingTeam(null);
     }
 
-    const newStreak = streak + 1;
     resetScore();
 
-    // ✅ CASO 1: gana y sigue (primera victoria)
+    // ✅ primer partido ganado
     if (newStreak === 1) {
-      if (pool.length >= 2) {
-        const challengers = pool.slice(0, 2);
-        const rest = pool.slice(2);
+      const challengers = pool.slice(0, 2);
+      const rest = pool.slice(2);
 
-        setCourts({
-          teamA: winTeam,
-          teamB: challengers,
-        });
+      setCourts({
+        teamA: winTeam,
+        teamB: challengers,
+      });
 
-        setWaiting(rest);
-        setStreak(1);
-      }
+      setWaiting(rest);
+      setStreak(1);
       return;
     }
 
-    // ✅ CASO 2: gana segunda vez → descansa
+    // ✅ segundo partido ganado → descanso
     if (newStreak === 2) {
       setRestingTeam(winTeam);
 
-      const { teamA, teamB, rest } = buildTeams(pool);
-      setCourts({ teamA, teamB });
+      const { teamA: t1, teamB: t2, rest } = buildTeams(pool);
+      setCourts({ teamA: t1, teamB: t2 });
       setWaiting(rest);
 
       setStreak(0);
@@ -197,7 +195,12 @@ export default function App() {
 
           {savedPlayers.map((p, i) => (
             <div key={i}>
-              <button onClick={() => selectPlayer(p)}>{p}</button>
+              <button
+                style={{ fontSize: "18px", padding: "10px", margin: "5px" }}
+                onClick={() => selectPlayer(p)}
+              >
+                {p}
+              </button>
               <button onClick={() => removeSavedPlayer(p)}>❌</button>
             </div>
           ))}
@@ -212,8 +215,12 @@ export default function App() {
               {p} <button onClick={() => removePlayer(p)}>❌</button>
             </div>
           ))}
+
           <div>{scoreA}</div>
+
           <button onClick={() => setScoreA(scoreA + 1)}>+ Punto</button>
+          <button onClick={() => setScoreA(0)}>🔄</button>
+
           <button disabled={scoreA <= scoreB} onClick={() => winner("A")}>
             Gana
           </button>
@@ -226,8 +233,12 @@ export default function App() {
               {p} <button onClick={() => removePlayer(p)}>❌</button>
             </div>
           ))}
+
           <div>{scoreB}</div>
+
           <button onClick={() => setScoreB(scoreB + 1)}>+ Punto</button>
+          <button onClick={() => setScoreB(0)}>🔄</button>
+
           <button disabled={scoreB <= scoreA} onClick={() => winner("B")}>
             Gana
           </button>
