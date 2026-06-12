@@ -30,7 +30,6 @@ export default function App() {
   const [streak, setStreak] = useState(0);
   const [restingTeam, setRestingTeam] = useState(null);
   const [showList, setShowList] = useState(false);
-
   const [darkMode, setDarkMode] = useState(false);
 
   const [scoreA, setScoreA] = useState(0);
@@ -71,6 +70,15 @@ export default function App() {
     setWaiting(rest);
   };
 
+  const removePlayer = (p) => {
+    const updated = players.filter((x) => x !== p);
+    setPlayers(updated);
+
+    const { teamA, teamB, rest } = buildTeams(updated);
+    setCourts({ teamA, teamB });
+    setWaiting(rest);
+  };
+
   const addToList = () => {
     if (!name) return;
 
@@ -79,6 +87,14 @@ export default function App() {
     }
 
     setName("");
+  };
+
+  const removeSavedPlayer = (p) => {
+    const updated = savedPlayers.filter((x) => x !== p);
+    setSavedPlayers(updated);
+
+    // también lo quita del juego si estaba
+    removePlayer(p);
   };
 
   const addWin = (team) => {
@@ -176,6 +192,7 @@ export default function App() {
           {savedPlayers.map((p, i) => (
             <div key={i}>
               <button onClick={() => selectPlayer(p)}>{p}</button>
+              <button onClick={() => removeSavedPlayer(p)}>❌</button>
             </div>
           ))}
         </>
@@ -185,7 +202,9 @@ export default function App() {
         <Box color="#1e40af" darkMode={darkMode}>
           <h3>Equipo A</h3>
           {courts.teamA.map((p, i) => (
-            <div key={i}>{p}</div>
+            <div key={i}>
+              {p} <button onClick={() => removePlayer(p)}>❌</button>
+            </div>
           ))}
 
           <div>{scoreA}</div>
@@ -194,10 +213,7 @@ export default function App() {
             + Punto
           </button>
 
-          <button
-            disabled={scoreA <= scoreB}
-            onClick={() => winner("A")}
-          >
+          <button disabled={scoreA <= scoreB} onClick={() => winner("A")}>
             Gana
           </button>
         </Box>
@@ -205,7 +221,9 @@ export default function App() {
         <Box color="#991b1b" darkMode={darkMode}>
           <h3>Equipo B</h3>
           {courts.teamB.map((p, i) => (
-            <div key={i}>{p}</div>
+            <div key={i}>
+              {p} <button onClick={() => removePlayer(p)}>❌</button>
+            </div>
           ))}
 
           <div>{scoreB}</div>
@@ -214,10 +232,7 @@ export default function App() {
             + Punto
           </button>
 
-          <button
-            disabled={scoreB <= scoreA}
-            onClick={() => winner("B")}
-          >
+          <button disabled={scoreB <= scoreA} onClick={() => winner("B")}>
             Gana
           </button>
         </Box>
@@ -229,7 +244,11 @@ export default function App() {
         {waiting.length === 0 ? (
           <div>Sin espera</div>
         ) : (
-          waiting.map((p, i) => <div key={i}>{p}</div>)
+          waiting.map((p, i) => (
+            <div key={i}>
+              {p} <button onClick={() => removePlayer(p)}>❌</button>
+            </div>
+          ))
         )}
       </div>
 
