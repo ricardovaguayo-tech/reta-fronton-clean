@@ -9,7 +9,7 @@ const Box = ({ children, color, darkMode }) => (
       borderRadius: "14px",
       background: color,
       color: "white",
-      minHeight: "120px",
+      minHeight: "150px",
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
@@ -65,7 +65,6 @@ export default function App() {
     setPlayers(updated);
 
     const { teamA, teamB, rest } = buildTeams(updated);
-
     setCourts({ teamA, teamB });
     setWaiting(rest);
   };
@@ -92,18 +91,14 @@ export default function App() {
   const removeSavedPlayer = (p) => {
     const updated = savedPlayers.filter((x) => x !== p);
     setSavedPlayers(updated);
-
-    // también lo quita del juego si estaba
     removePlayer(p);
   };
 
   const addWin = (team) => {
     const copy = { ...wins };
-
     team.forEach((p) => {
       copy[p] = (copy[p] || 0) + 1;
     });
-
     setWins(copy);
   };
 
@@ -112,6 +107,7 @@ export default function App() {
     setScoreB(0);
   };
 
+  // ✅ ✅ LÓGICA CORRECTA
   const winner = (side) => {
     const { teamA, teamB } = courts;
 
@@ -122,37 +118,45 @@ export default function App() {
 
     addWin(winTeam);
 
+    // 🔥 eliminar perdedores y meterlos al final
     let pool = [...waiting, ...loseTeam];
 
+    // 🔥 si había equipo descansando → regresa primero
     if (restingTeam) {
       pool = [...restingTeam, ...pool];
       setRestingTeam(null);
     }
 
     const newStreak = streak + 1;
-
     resetScore();
 
-    if (pool.length >= 4) {
-      if (newStreak >= 2) {
-        setRestingTeam(winTeam);
+    // ✅ CASO 1: gana y sigue (primera victoria)
+    if (newStreak === 1) {
+      if (pool.length >= 2) {
+        const challengers = pool.slice(0, 2);
+        const rest = pool.slice(2);
 
-        const { teamA, teamB, rest } = buildTeams(pool);
+        setCourts({
+          teamA: winTeam,
+          teamB: challengers,
+        });
 
-        setCourts({ teamA, teamB });
         setWaiting(rest);
-        setStreak(0);
-        return;
+        setStreak(1);
       }
+      return;
+    }
+
+    // ✅ CASO 2: gana segunda vez → descansa
+    if (newStreak === 2) {
+      setRestingTeam(winTeam);
 
       const { teamA, teamB, rest } = buildTeams(pool);
-
       setCourts({ teamA, teamB });
       setWaiting(rest);
-      setStreak(newStreak);
-    } else {
-      setWaiting(pool);
-      setStreak(newStreak);
+
+      setStreak(0);
+      return;
     }
   };
 
@@ -162,6 +166,8 @@ export default function App() {
     <div
       style={{
         padding: 20,
+        maxWidth: "1000px",
+        margin: "auto",
         background: darkMode ? "#111827" : "white",
         color: darkMode ? "white" : "black",
         minHeight: "100vh",
@@ -198,40 +204,30 @@ export default function App() {
         </>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-        <Box color="#1e40af" darkMode={darkMode}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 15 }}>
+        <Box color="#2563eb" darkMode={darkMode}>
           <h3>Equipo A</h3>
           {courts.teamA.map((p, i) => (
             <div key={i}>
               {p} <button onClick={() => removePlayer(p)}>❌</button>
             </div>
           ))}
-
           <div>{scoreA}</div>
-
-          <button onClick={() => setScoreA(scoreA + 1)}>
-            + Punto
-          </button>
-
+          <button onClick={() => setScoreA(scoreA + 1)}>+ Punto</button>
           <button disabled={scoreA <= scoreB} onClick={() => winner("A")}>
             Gana
           </button>
         </Box>
 
-        <Box color="#991b1b" darkMode={darkMode}>
+        <Box color="#dc2626" darkMode={darkMode}>
           <h3>Equipo B</h3>
           {courts.teamB.map((p, i) => (
             <div key={i}>
               {p} <button onClick={() => removePlayer(p)}>❌</button>
             </div>
           ))}
-
           <div>{scoreB}</div>
-
-          <button onClick={() => setScoreB(scoreB + 1)}>
-            + Punto
-          </button>
-
+          <button onClick={() => setScoreB(scoreB + 1)}>+ Punto</button>
           <button disabled={scoreB <= scoreA} onClick={() => winner("B")}>
             Gana
           </button>
@@ -240,7 +236,6 @@ export default function App() {
 
       <div style={{ marginTop: 20 }}>
         <h3>🪑 Fila</h3>
-
         {waiting.length === 0 ? (
           <div>Sin espera</div>
         ) : (
@@ -254,7 +249,6 @@ export default function App() {
 
       <div>
         <h3>🏆 Ranking</h3>
-
         {ranking.map(([p, w], i) => (
           <div key={i}>
             {i + 1}. {p} - {w}
