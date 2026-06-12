@@ -1,13 +1,13 @@
 
 import { useState, useEffect } from "react";
 
-const Box = ({ children, color, dark }) => (
+const Box = ({ children, color }) => (
   <div
     style={{
-      border: dark ? "1px solid #444" : "2px solid black",
+      border: "2px solid black",
       padding: "12px",
       borderRadius: "14px",
-      background: color || (dark ? "#1f2937" : "white"),
+      background: color,
       color: "white",
       minHeight: "100px",
       display: "flex",
@@ -20,19 +20,6 @@ const Box = ({ children, color, dark }) => (
   </div>
 );
 
-const Button = ({ dark, ...props }) => (
-  <button
-    style={{
-      padding: "10px",
-      margin: "5px",
-      cursor: "pointer",
-      borderRadius: "8px",
-      fontWeight: "bold",
-    }}
-    {...props}
-  />
-);
-
 export default function App() {
   const [players, setPlayers] = useState([]);
   const [savedPlayers, setSavedPlayers] = useState([]);
@@ -43,7 +30,6 @@ export default function App() {
   const [streak, setStreak] = useState(0);
   const [restingTeam, setRestingTeam] = useState(null);
   const [showList, setShowList] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
 
   const [scoreA, setScoreA] = useState(0);
   const [scoreB, setScoreB] = useState(0);
@@ -60,7 +46,10 @@ export default function App() {
   }, [savedPlayers]);
 
   const buildTeams = (list) => {
-    if (list.length < 4) return { teamA: [], teamB: [], rest: [] };
+    if (list.length < 4) {
+      return { teamA: [], teamB: [], rest: list };
+    }
+
     return {
       teamA: [list[0], list[1]],
       teamB: [list[2], list[3]],
@@ -68,36 +57,35 @@ export default function App() {
     };
   };
 
-  // ✅ ESTA es la función corregida
   const selectPlayer = (p) => {
     if (players.includes(p)) return;
 
     const updated = [...players, p];
     setPlayers(updated);
 
-    if (updated.length >= 4) {
-      const { teamA, teamB, rest } = buildTeams(updated);
-      setCourts({ teamA, teamB });
-      setWaiting(rest);
-    } else {
-      setCourts({ teamA: [], teamB: [] });
-      setWaiting(updated);
-    }
+    const { teamA, teamB, rest } = buildTeams(updated);
+
+    setCourts({ teamA, teamB });
+    setWaiting(rest);
   };
 
   const addToList = () => {
     if (!name) return;
+
     if (!savedPlayers.includes(name)) {
       setSavedPlayers([...savedPlayers, name]);
     }
+
     setName("");
   };
 
   const addWin = (team) => {
     const copy = { ...wins };
+
     team.forEach((p) => {
       copy[p] = (copy[p] || 0) + 1;
     });
+
     setWins(copy);
   };
 
@@ -108,6 +96,7 @@ export default function App() {
 
   const winner = (side) => {
     const { teamA, teamB } = courts;
+
     if (teamA.length < 2 || teamB.length < 2) return;
 
     const winTeam = side === "A" ? teamA : teamB;
@@ -123,23 +112,24 @@ export default function App() {
     }
 
     const newStreak = streak + 1;
+
     resetScore();
 
     if (pool.length >= 4) {
       if (newStreak >= 2) {
         setRestingTeam(winTeam);
 
-        const { teamA: t1, teamB: t2, rest } = buildTeams(pool);
-        setCourts({ teamA: t1, teamB: t2 });
+        const { teamA, teamB, rest } = buildTeams(pool);
+
+        setCourts({ teamA, teamB });
         setWaiting(rest);
         setStreak(0);
         return;
       }
 
-      const challengers = pool.slice(0, 2);
-      const rest = pool.slice(2);
+      const { teamA, teamB, rest } = buildTeams(pool);
 
-      setCourts({ teamA: winTeam, teamB: challengers });
+      setCourts({ teamA, teamB });
       setWaiting(rest);
       setStreak(newStreak);
     } else {
@@ -154,10 +144,6 @@ export default function App() {
     <div style={{ padding: 20 }}>
       <h2>🎾 Reta Frontón</h2>
 
-      <button onClick={() => setDarkMode(!darkMode)}>
-        {darkMode ? "Claro" : "Oscuro"}
-      </button>
-
       <h3>🔥 Racha: {streak} / 2</h3>
 
       <h3 onClick={() => setShowList(!showList)}>
@@ -166,7 +152,12 @@ export default function App() {
 
       {showList && (
         <>
-          <input value={name} onChange={(e) => setName(e.target.value)} />
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Nuevo jugador"
+          />
+
           <button onClick={addToList}>Agregar</button>
 
           {savedPlayers.map((p, i) => (
@@ -177,16 +168,23 @@ export default function App() {
         </>
       )}
 
-      {/* CANCHA */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
         <Box color="blue">
           <h3>Equipo A</h3>
           {courts.teamA.map((p, i) => (
             <div key={i}>{p}</div>
           ))}
+
           <div>{scoreA}</div>
-          <button onClick={() => setScoreA(scoreA + 1)}>+ Punto</button>
-          <button disabled={scoreA <= scoreB} onClick={() => winner("A")}>
+
+          <button onClick={() => setScoreA(scoreA + 1)}>
+            + Punto
+          </button>
+
+          <button
+            disabled={scoreA <= scoreB}
+            onClick={() => winner("A")}
+          >
             Gana
           </button>
         </Box>
@@ -196,17 +194,25 @@ export default function App() {
           {courts.teamB.map((p, i) => (
             <div key={i}>{p}</div>
           ))}
+
           <div>{scoreB}</div>
-          <button onClick={() => setScoreB(scoreB + 1)}>+ Punto</button>
-          <button disabled={scoreB <= scoreA} onClick={() => winner("B")}>
+
+          <button onClick={() => setScoreB(scoreB + 1)}>
+            + Punto
+          </button>
+
+          <button
+            disabled={scoreB <= scoreA}
+            onClick={() => winner("B")}
+          >
             Gana
           </button>
         </Box>
       </div>
 
-      {/* ✅ FILA */}
       <div style={{ marginTop: 20 }}>
         <h3>🪑 Fila</h3>
+
         {waiting.length === 0 ? (
           <div>Sin espera</div>
         ) : (
@@ -214,15 +220,19 @@ export default function App() {
         )}
       </div>
 
-      {/* RANKING */}
       <div>
         <h3>🏆 Ranking</h3>
+
         {ranking.map(([p, w], i) => (
           <div key={i}>
             {i + 1}. {p} - {w}
           </div>
         ))}
       </div>
+
+      {restingTeam && (
+        <div>💤 Descansando: {restingTeam.join(", ")}</div>
+      )}
     </div>
   );
 }
