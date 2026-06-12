@@ -9,12 +9,12 @@ const Box = ({ children, color, darkMode }) => (
       borderRadius: "14px",
       background: color,
       color: "white",
-      minHeight: "150px",
+      minHeight: "160px",
+      width: "100%",
       display: "flex",
       flexDirection: "column",
-      justifyContent: "center",
+      justifyContent: "space-between",
       alignItems: "center",
-      width: "100%"
     }}
   >
     {children}
@@ -108,7 +108,7 @@ export default function App() {
     setScoreB(0);
   };
 
-  // ✅ LÓGICA FINAL CORRECTA
+  // ✅ ✅ LÓGICA FINAL CORREGIDA 100%
   const winner = (side) => {
     const { teamA, teamB } = courts;
     if (teamA.length < 2 || teamB.length < 2) return;
@@ -118,11 +118,14 @@ export default function App() {
 
     addWin(winTeam);
 
+    // ✅ Detectar si el equipo ganador venía de descanso
+    const cameFromRest =
+      restingTeam &&
+      JSON.stringify(restingTeam) === JSON.stringify(winTeam);
+
     let pool = [...waiting, ...loseTeam];
 
-    // 👉 si regresan del descanso → reinician racha
-    let newStreak = restingTeam ? 1 : streak + 1;
-
+    // ✅ reintroducir descansado
     if (restingTeam) {
       pool = [...restingTeam, ...pool];
       setRestingTeam(null);
@@ -130,7 +133,10 @@ export default function App() {
 
     resetScore();
 
-    // ✅ primer partido ganado
+    // ✅ CORRECCIÓN CLAVE
+    const newStreak = cameFromRest ? 1 : streak + 1;
+
+    // ✅ PRIMERA VICTORIA
     if (newStreak === 1) {
       const challengers = pool.slice(0, 2);
       const rest = pool.slice(2);
@@ -145,11 +151,12 @@ export default function App() {
       return;
     }
 
-    // ✅ segundo partido ganado → descanso
+    // ✅ SEGUNDA VICTORIA → DESCANSA
     if (newStreak === 2) {
       setRestingTeam(winTeam);
 
       const { teamA: t1, teamB: t2, rest } = buildTeams(pool);
+
       setCourts({ teamA: t1, teamB: t2 });
       setWaiting(rest);
 
@@ -164,7 +171,7 @@ export default function App() {
     <div
       style={{
         padding: 20,
-        maxWidth: "1000px",
+        maxWidth: "1100px",
         margin: "auto",
         background: darkMode ? "#111827" : "white",
         color: darkMode ? "white" : "black",
@@ -196,7 +203,7 @@ export default function App() {
           {savedPlayers.map((p, i) => (
             <div key={i}>
               <button
-                style={{ fontSize: "18px", padding: "10px", margin: "5px" }}
+                style={{ fontSize: "20px", padding: "12px", margin: "5px" }}
                 onClick={() => selectPlayer(p)}
               >
                 {p}
@@ -207,39 +214,72 @@ export default function App() {
         </>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 15 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+
         <Box color="#2563eb" darkMode={darkMode}>
+          <button
+            style={{ fontSize: "18px", padding: "10px" }}
+            onClick={() => setScoreA(0)}
+          >
+            🔄 Reset
+          </button>
+
           <h3>Equipo A</h3>
+
           {courts.teamA.map((p, i) => (
             <div key={i}>
               {p} <button onClick={() => removePlayer(p)}>❌</button>
             </div>
           ))}
 
-          <div>{scoreA}</div>
+          <div style={{ fontSize: "30px" }}>{scoreA}</div>
 
-          <button onClick={() => setScoreA(scoreA + 1)}>+ Punto</button>
-          <button onClick={() => setScoreA(0)}>🔄</button>
+          <button
+            style={{ fontSize: "18px", padding: "10px" }}
+            onClick={() => setScoreA(scoreA + 1)}
+          >
+            + Punto
+          </button>
 
-          <button disabled={scoreA <= scoreB} onClick={() => winner("A")}>
+          <button
+            style={{ fontSize: "18px", padding: "10px" }}
+            disabled={scoreA <= scoreB}
+            onClick={() => winner("A")}
+          >
             Gana
           </button>
         </Box>
 
         <Box color="#dc2626" darkMode={darkMode}>
+          <button
+            style={{ fontSize: "18px", padding: "10px" }}
+            onClick={() => setScoreB(0)}
+          >
+            🔄 Reset
+          </button>
+
           <h3>Equipo B</h3>
+
           {courts.teamB.map((p, i) => (
             <div key={i}>
               {p} <button onClick={() => removePlayer(p)}>❌</button>
             </div>
           ))}
 
-          <div>{scoreB}</div>
+          <div style={{ fontSize: "30px" }}>{scoreB}</div>
 
-          <button onClick={() => setScoreB(scoreB + 1)}>+ Punto</button>
-          <button onClick={() => setScoreB(0)}>🔄</button>
+          <button
+            style={{ fontSize: "18px", padding: "10px" }}
+            onClick={() => setScoreB(scoreB + 1)}
+          >
+            + Punto
+          </button>
 
-          <button disabled={scoreB <= scoreA} onClick={() => winner("B")}>
+          <button
+            style={{ fontSize: "18px", padding: "10px" }}
+            disabled={scoreB <= scoreA}
+            onClick={() => winner("B")}
+          >
             Gana
           </button>
         </Box>
