@@ -28,8 +28,6 @@ export default function App() {
   const [courts, setCourts] = useState({ teamA: [], teamB: [] });
 
   const [name, setName] = useState("");
-  const [streak, setStreak] = useState(0);
-  const [restingTeam, setRestingTeam] = useState(null);
   const [showList, setShowList] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
@@ -37,6 +35,12 @@ export default function App() {
   const [scoreB, setScoreB] = useState(0);
 
   const [wins, setWins] = useState({});
+
+  // ✅ CONTROL REAL DE RACHA
+  const [consecutiveWins, setConsecutiveWins] = useState(0);
+  const [currentChampion, setCurrentChampion] = useState(null);
+
+  const [restingTeam, setRestingTeam] = useState(null);
 
   useEffect(() => {
     const data = localStorage.getItem("players");
@@ -67,6 +71,7 @@ export default function App() {
 
     const { teamA, teamB, rest } = buildTeams(updated);
     setCourts({ teamA, teamB });
+
     setWaiting(rest);
   };
 
@@ -108,7 +113,7 @@ export default function App() {
     setScoreB(0);
   };
 
-  // ✅ ✅ LÓGICA FINAL CORREGIDA 100%
+  // ✅ LÓGICA REESCRITA SIN BUG
   const winner = (side) => {
     const { teamA, teamB } = courts;
     if (teamA.length < 2 || teamB.length < 2) return;
@@ -118,14 +123,9 @@ export default function App() {
 
     addWin(winTeam);
 
-    // ✅ Detectar si el equipo ganador venía de descanso
-    const cameFromRest =
-      restingTeam &&
-      JSON.stringify(restingTeam) === JSON.stringify(winTeam);
-
     let pool = [...waiting, ...loseTeam];
 
-    // ✅ reintroducir descansado
+    // 🔥 Si hay equipo descansando → regresa primero
     if (restingTeam) {
       pool = [...restingTeam, ...pool];
       setRestingTeam(null);
@@ -133,36 +133,37 @@ export default function App() {
 
     resetScore();
 
-    // ✅ CORRECCIÓN CLAVE
-    const newStreak = cameFromRest ? 1 : streak + 1;
+    const sameChampion =
+      currentChampion &&
+      JSON.stringify(currentChampion) === JSON.stringify(winTeam);
 
-    // ✅ PRIMERA VICTORIA
-    if (newStreak === 1) {
-      const challengers = pool.slice(0, 2);
-      const rest = pool.slice(2);
+    let newWins = sameChampion ? consecutiveWins + 1 : 1;
 
-      setCourts({
-        teamA: winTeam,
-        teamB: challengers,
-      });
-
-      setWaiting(rest);
-      setStreak(1);
-      return;
-    }
-
-    // ✅ SEGUNDA VICTORIA → DESCANSA
-    if (newStreak === 2) {
+    // ✅ SI GANA 2 → DESCANSA
+    if (newWins >= 2) {
       setRestingTeam(winTeam);
+      setCurrentChampion(null);
+      setConsecutiveWins(0);
 
-      const { teamA: t1, teamB: t2, rest } = buildTeams(pool);
-
-      setCourts({ teamA: t1, teamB: t2 });
+      const { teamA, teamB, rest } = buildTeams(pool);
+      setCourts({ teamA, teamB });
       setWaiting(rest);
-
-      setStreak(0);
       return;
     }
+
+    // ✅ SIGUE COMO CAMPEÓN
+    setCurrentChampion(winTeam);
+    setConsecutiveWins(newWins);
+
+    const challengers = pool.slice(0, 2);
+    const rest = pool.slice(2);
+
+    setCourts({
+      teamA: winTeam,
+      teamB: challengers,
+    });
+
+    setWaiting(rest);
   };
 
   const ranking = Object.entries(wins).sort((a, b) => b[1] - a[1]);
@@ -184,7 +185,7 @@ export default function App() {
         {darkMode ? "☀️ Claro" : "🌙 Oscuro"}
       </button>
 
-      <h3>🔥 Racha: {streak} / 2</h3>
+      <h3>🔥 Racha: {consecutiveWins} / 2</h3>
 
       <h3 onClick={() => setShowList(!showList)}>
         📋 Jugadores {showList ? "▲" : "▼"}
@@ -287,15 +288,11 @@ export default function App() {
 
       <div style={{ marginTop: 20 }}>
         <h3>🪑 Fila</h3>
-        {waiting.length === 0 ? (
-          <div>Sin espera</div>
-        ) : (
-          waiting.map((p, i) => (
-            <div key={i}>
-              {p} <button onClick={() => removePlayer(p)}>❌</button>
-            </div>
-          ))
-        )}
+        {waiting.map((p, i) => (
+          <div key={i}>
+            {p} <button onClick={() => removePlayer(p)}>❌</button>
+          </div>
+        ))}
       </div>
 
       <div>
