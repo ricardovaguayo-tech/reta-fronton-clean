@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+
 
 const Box = ({ children, color, darkMode }) => (
   <div
@@ -110,7 +110,6 @@ export default function App() {
     setScoreB(0);
   };
 
-  // ✅ FIX CLONES
   const winner = (side) => {
     const { teamA, teamB } = courts;
     if (teamA.length < 2 || teamB.length < 2) return;
@@ -146,13 +145,12 @@ export default function App() {
       return;
     }
 
-    // ✅ FILTRAR PARA EVITAR CLONES
     const filteredPool = pool.filter(
       (p) => !winTeam.includes(p)
     );
 
     const challengers = filteredPool.slice(0, 2);
-    const rest = [...filteredPool.slice(2)];
+    const rest = filteredPool.slice(2);
 
     setCourts({
       teamA: winTeam,
@@ -164,10 +162,17 @@ export default function App() {
     setConsecutiveWins(newWins);
   };
 
-  const ranking = Object.entries(wins).sort((a, b) => b[1] - a[1]);
-
   return (
-    <div style={{ padding: 20, maxWidth: "1100px", margin: "auto" }}>
+    <div
+      style={{
+        padding: 20,
+        maxWidth: "1100px",
+        margin: "auto",
+        background: darkMode ? "#111827" : "white",
+        color: darkMode ? "white" : "black",
+        minHeight: "100vh",
+      }}
+    >
       <h2 style={{ textAlign: "center" }}>🎾 Reta Frontón</h2>
 
       <button onClick={() => setDarkMode(!darkMode)}>
@@ -182,7 +187,12 @@ export default function App() {
 
       {showList && (
         <>
-          <input value={name} onChange={(e) => setName(e.target.value)} />
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Nuevo jugador"
+          />
+
           <button onClick={addToList}>Agregar</button>
 
           {savedPlayers.map((p, i) => (
@@ -200,26 +210,27 @@ export default function App() {
       )}
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-        <Box color="#2563eb">
+
+        <Box color="#2563eb" darkMode={darkMode}>
           <button onClick={() => setScoreA(0)}>🔄 Reset</button>
           <h3>Equipo A</h3>
           {courts.teamA.map((p, i) => (
-            <div key={i}>{p}</div>
+            <div key={i}>{p} <button onClick={() => removePlayer(p)}>❌</button></div>
           ))}
-          <div>{scoreA}</div>
+          <div style={{ fontSize: "30px" }}>{scoreA}</div>
           <button onClick={() => setScoreA(scoreA + 1)}>+ Punto</button>
           <button disabled={scoreA <= scoreB} onClick={() => winner("A")}>
             Gana
           </button>
         </Box>
 
-        <Box color="#dc2626">
+        <Box color="#dc2626" darkMode={darkMode}>
           <button onClick={() => setScoreB(0)}>🔄 Reset</button>
           <h3>Equipo B</h3>
           {courts.teamB.map((p, i) => (
-            <div key={i}>{p}</div>
+            <div key={i}>{p} <button onClick={() => removePlayer(p)}>❌</button></div>
           ))}
-          <div>{scoreB}</div>
+          <div style={{ fontSize: "30px" }}>{scoreB}</div>
           <button onClick={() => setScoreB(scoreB + 1)}>+ Punto</button>
           <button disabled={scoreB <= scoreA} onClick={() => winner("B")}>
             Gana
@@ -229,8 +240,12 @@ export default function App() {
 
       <h3>🪑 Fila</h3>
       {waiting.map((p, i) => (
-        <div key={i}>{p}</div>
+        <div key={i}>{p} <button onClick={() => removePlayer(p)}>❌</button></div>
       ))}
+
+      {restingTeam && (
+        <div>💤 Descansando: {restingTeam.join(", ")}</div>
+      )}
     </div>
   );
 }
