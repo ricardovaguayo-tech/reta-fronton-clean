@@ -22,6 +22,9 @@ const Box = ({ children, color, darkMode }) => (
 );
 
 export default function App() {
+  // ✅ ahora inicia en oscuro
+  const [darkMode, setDarkMode] = useState(true);
+
   const [players, setPlayers] = useState([]);
   const [savedPlayers, setSavedPlayers] = useState([]);
   const [waiting, setWaiting] = useState([]);
@@ -29,7 +32,6 @@ export default function App() {
 
   const [name, setName] = useState("");
   const [showList, setShowList] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
 
   const [scoreA, setScoreA] = useState(0);
   const [scoreB, setScoreB] = useState(0);
@@ -183,8 +185,8 @@ export default function App() {
         padding: 20,
         maxWidth: "1100px",
         margin: "auto",
-        background: "linear-gradient(#0f5132, #198754)", // ✅ estilo cancha
-        color: "white",
+        background: darkMode ? "#111827" : "white",
+        color: darkMode ? "white" : "black",
         minHeight: "100vh",
       }}
     >
@@ -196,7 +198,6 @@ export default function App() {
 
       <h3>🔥 Racha: {consecutiveWins} / 2</h3>
 
-      {/* ✅ LISTA DE JUGADORES */}
       <div style={{ marginBottom: "40px" }}>
         <h3 onClick={() => setShowList(!showList)}>
           📋 Jugadores {showList ? "▲" : "▼"}
@@ -227,7 +228,6 @@ export default function App() {
         )}
       </div>
 
-      {/* ✅ CANCHA */}
       <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
         🎾 CANCHA
       </h2>
