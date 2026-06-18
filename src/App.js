@@ -72,9 +72,7 @@ export default function App() {
     setWaiting(rest);
   };
 
-  // ✅ FUNCIÓN CORREGIDA
   const removePlayer = (p) => {
-    // eliminar de lista global
     const updatedPlayers = players.filter((x) => x !== p);
     setPlayers(updatedPlayers);
 
@@ -82,13 +80,11 @@ export default function App() {
     let newTeamB = courts.teamB.filter((x) => x !== p);
     let newWaiting = waiting.filter((x) => x !== p);
 
-    // llenar equipo A si falta
     if (newTeamA.length < 2 && newWaiting.length > 0) {
       newTeamA.push(newWaiting[0]);
       newWaiting = newWaiting.slice(1);
     }
 
-    // llenar equipo B si falta
     if (newTeamB.length < 2 && newWaiting.length > 0) {
       newTeamB.push(newWaiting[0]);
       newWaiting = newWaiting.slice(1);
@@ -187,8 +183,8 @@ export default function App() {
         padding: 20,
         maxWidth: "1100px",
         margin: "auto",
-        background: darkMode ? "#111827" : "white",
-        color: darkMode ? "white" : "black",
+        background: "linear-gradient(#0f5132, #198754)", // ✅ estilo cancha
+        color: "white",
         minHeight: "100vh",
       }}
     >
@@ -200,63 +196,83 @@ export default function App() {
 
       <h3>🔥 Racha: {consecutiveWins} / 2</h3>
 
-      <h3 onClick={() => setShowList(!showList)}>
-        📋 Jugadores {showList ? "▲" : "▼"}
-      </h3>
+      {/* ✅ LISTA DE JUGADORES */}
+      <div style={{ marginBottom: "40px" }}>
+        <h3 onClick={() => setShowList(!showList)}>
+          📋 Jugadores {showList ? "▲" : "▼"}
+        </h3>
 
-      {showList && (
-        <>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Nuevo jugador"
-          />
+        {showList && (
+          <>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Nuevo jugador"
+            />
 
-          <button onClick={addToList}>Agregar</button>
+            <button onClick={addToList}>Agregar</button>
 
-          {savedPlayers.map((p, i) => (
-            <div key={i}>
-              <button
-                style={{ fontSize: "20px", padding: "12px", margin: "5px" }}
-                onClick={() => selectPlayer(p)}
-              >
-                {p}
-              </button>
-              <button onClick={() => removeSavedPlayer(p)}>❌</button>
-            </div>
-          ))}
-        </>
-      )}
+            {savedPlayers.map((p, i) => (
+              <div key={i}>
+                <button
+                  style={{ fontSize: "20px", padding: "12px", margin: "5px" }}
+                  onClick={() => selectPlayer(p)}
+                >
+                  {p}
+                </button>
+                <button onClick={() => removeSavedPlayer(p)}>❌</button>
+              </div>
+            ))}
+          </>
+        )}
+      </div>
+
+      {/* ✅ CANCHA */}
+      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
+        🎾 CANCHA
+      </h2>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
         <Box color="#2563eb" darkMode={darkMode}>
-          <button onClick={() => setScoreA(0)}>🔄 Reset</button>
+          <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+            <button onClick={() => setScoreA(0)}>🔄 Reset</button>
+            <button disabled={scoreA <= scoreB} onClick={() => winner("A")}>
+              ✅ Gana
+            </button>
+          </div>
+
           <h3>Equipo A</h3>
+
           {courts.teamA.map((p, i) => (
             <div key={i}>
               {p} <button onClick={() => removePlayer(p)}>❌</button>
             </div>
           ))}
+
           <div style={{ fontSize: "30px" }}>{scoreA}</div>
+
           <button onClick={() => setScoreA(scoreA + 1)}>+ Punto</button>
-          <button disabled={scoreA <= scoreB} onClick={() => winner("A")}>
-            Gana
-          </button>
         </Box>
 
         <Box color="#dc2626" darkMode={darkMode}>
-          <button onClick={() => setScoreB(0)}>🔄 Reset</button>
+          <div style={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+            <button onClick={() => setScoreB(0)}>🔄 Reset</button>
+            <button disabled={scoreB <= scoreA} onClick={() => winner("B")}>
+              ✅ Gana
+            </button>
+          </div>
+
           <h3>Equipo B</h3>
+
           {courts.teamB.map((p, i) => (
             <div key={i}>
               {p} <button onClick={() => removePlayer(p)}>❌</button>
             </div>
           ))}
+
           <div style={{ fontSize: "30px" }}>{scoreB}</div>
+
           <button onClick={() => setScoreB(scoreB + 1)}>+ Punto</button>
-          <button disabled={scoreB <= scoreA} onClick={() => winner("B")}>
-            Gana
-          </button>
         </Box>
       </div>
 
