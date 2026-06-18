@@ -72,13 +72,34 @@ export default function App() {
     setWaiting(rest);
   };
 
+  // ✅ FUNCIÓN CORREGIDA
   const removePlayer = (p) => {
-    const updated = players.filter((x) => x !== p);
-    setPlayers(updated);
+    // eliminar de lista global
+    const updatedPlayers = players.filter((x) => x !== p);
+    setPlayers(updatedPlayers);
 
-    const { teamA, teamB, rest } = buildTeams(updated);
-    setCourts({ teamA, teamB });
-    setWaiting(rest);
+    let newTeamA = courts.teamA.filter((x) => x !== p);
+    let newTeamB = courts.teamB.filter((x) => x !== p);
+    let newWaiting = waiting.filter((x) => x !== p);
+
+    // llenar equipo A si falta
+    if (newTeamA.length < 2 && newWaiting.length > 0) {
+      newTeamA.push(newWaiting[0]);
+      newWaiting = newWaiting.slice(1);
+    }
+
+    // llenar equipo B si falta
+    if (newTeamB.length < 2 && newWaiting.length > 0) {
+      newTeamB.push(newWaiting[0]);
+      newWaiting = newWaiting.slice(1);
+    }
+
+    setCourts({
+      teamA: newTeamA,
+      teamB: newTeamB,
+    });
+
+    setWaiting(newWaiting);
   };
 
   const addToList = () => {
@@ -145,9 +166,7 @@ export default function App() {
       return;
     }
 
-    const filteredPool = pool.filter(
-      (p) => !winTeam.includes(p)
-    );
+    const filteredPool = pool.filter((p) => !winTeam.includes(p));
 
     const challengers = filteredPool.slice(0, 2);
     const rest = filteredPool.slice(2);
@@ -210,12 +229,13 @@ export default function App() {
       )}
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-
         <Box color="#2563eb" darkMode={darkMode}>
           <button onClick={() => setScoreA(0)}>🔄 Reset</button>
           <h3>Equipo A</h3>
           {courts.teamA.map((p, i) => (
-            <div key={i}>{p} <button onClick={() => removePlayer(p)}>❌</button></div>
+            <div key={i}>
+              {p} <button onClick={() => removePlayer(p)}>❌</button>
+            </div>
           ))}
           <div style={{ fontSize: "30px" }}>{scoreA}</div>
           <button onClick={() => setScoreA(scoreA + 1)}>+ Punto</button>
@@ -228,7 +248,9 @@ export default function App() {
           <button onClick={() => setScoreB(0)}>🔄 Reset</button>
           <h3>Equipo B</h3>
           {courts.teamB.map((p, i) => (
-            <div key={i}>{p} <button onClick={() => removePlayer(p)}>❌</button></div>
+            <div key={i}>
+              {p} <button onClick={() => removePlayer(p)}>❌</button>
+            </div>
           ))}
           <div style={{ fontSize: "30px" }}>{scoreB}</div>
           <button onClick={() => setScoreB(scoreB + 1)}>+ Punto</button>
@@ -240,7 +262,9 @@ export default function App() {
 
       <h3>🪑 Fila</h3>
       {waiting.map((p, i) => (
-        <div key={i}>{p} <button onClick={() => removePlayer(p)}>❌</button></div>
+        <div key={i}>
+          {p} <button onClick={() => removePlayer(p)}>❌</button>
+        </div>
       ))}
 
       {restingTeam && (
