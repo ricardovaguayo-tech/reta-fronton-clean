@@ -6,8 +6,8 @@ const Box = ({ children, color, darkMode }) => (
       border: darkMode ? "1px solid #444" : "2px solid black",
       padding: "12px",
       borderRadius: "14px",
-      background: darkMode ? "rgba(0,0,0,0.5)" : color,
-      color: darkMode ? "white" : "#1d4ed8",
+      background: color, // ✅ se mantienen colores originales
+      color: "yellow", // ✅ texto en amarillo siempre
       minHeight: "160px",
       width: "100%",
       display: "flex",
@@ -103,11 +103,7 @@ export default function App() {
       newResting = null;
     }
 
-    setCourts({
-      teamA: newTeamA,
-      teamB: newTeamB,
-    });
-
+    setCourts({ teamA: newTeamA, teamB: newTeamB });
     setWaiting(newWaiting);
     setRestingTeam(newResting);
   };
@@ -198,12 +194,8 @@ export default function App() {
         maxWidth: "1100px",
         margin: "auto",
         minHeight: "100vh",
-        color: darkMode ? "white" : "#1d4ed8",
-        backgroundImage: darkMode ? "url('/fronton.png')" : "none",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        backgroundColor: darkMode ? "#000" : "white",
+        color: "yellow", // ✅ texto amarillo global
+        background: darkMode ? "#111827" : "white",
       }}
     >
       <h2 style={{ textAlign: "center" }}>🎾 Reta Frontón</h2>
