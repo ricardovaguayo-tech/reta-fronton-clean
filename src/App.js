@@ -6,8 +6,8 @@ const Box = ({ children, color, darkMode }) => (
       border: darkMode ? "1px solid #444" : "2px solid black",
       padding: "12px",
       borderRadius: "14px",
-      background: color, // ✅ se mantienen colores originales
-      color: "yellow", // ✅ texto en amarillo siempre
+      background: color,
+      color: "yellow",
       minHeight: "160px",
       width: "100%",
       display: "flex",
@@ -194,8 +194,11 @@ export default function App() {
         maxWidth: "1100px",
         margin: "auto",
         minHeight: "100vh",
-        color: "yellow", // ✅ texto amarillo global
+        color: "yellow",
         background: darkMode ? "#111827" : "white",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center", // ✅ mejora aplicada: centrar elementos
       }}
     >
       <h2 style={{ textAlign: "center" }}>🎾 Reta Frontón</h2>
@@ -206,7 +209,7 @@ export default function App() {
 
       <h3>🔥 Racha: {consecutiveWins} / 2</h3>
 
-      <div style={{ marginBottom: "40px" }}>
+      <div style={{ marginBottom: "40px", width: "100%" }}>
         <h3 onClick={() => setShowList(!showList)}>
           📋 Jugadores {showList ? "▲" : "▼"}
         </h3>
@@ -233,7 +236,15 @@ export default function App() {
 
       <h2 style={{ textAlign: "center" }}>🎾 CANCHA</h2>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 20,
+          width: "100%",
+          justifyContent: "center", // ✅ mejora aplicada
+        }}
+      >
         <Box color="#2563eb" darkMode={darkMode}>
           <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
             <button onClick={() => setScoreA(0)}>🔄 Reset</button>
@@ -255,34 +266,3 @@ export default function App() {
 
         <Box color="#dc2626" darkMode={darkMode}>
           <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
-            <button onClick={() => setScoreB(0)}>🔄 Reset</button>
-            <button disabled={scoreB <= scoreA} onClick={() => winner("B")}>
-              ✅ Gana
-            </button>
-          </div>
-
-          <h3>Equipo B</h3>
-          {courts.teamB.map((p, i) => (
-            <div key={i}>
-              {p} <button onClick={() => removePlayer(p)}>❌</button>
-            </div>
-          ))}
-
-          <div style={{ fontSize: 30 }}>{scoreB}</div>
-          <button onClick={() => setScoreB(scoreB + 1)}>+ Punto</button>
-        </Box>
-      </div>
-
-      <h3>🪑 Fila</h3>
-      {waiting.map((p, i) => (
-        <div key={i}>
-          {p} <button onClick={() => removePlayer(p)}>❌</button>
-        </div>
-      ))}
-
-      {restingTeam && (
-        <div>💤 Descansando: {restingTeam.join(", ")}</div>
-      )}
-    </div>
-  );
-}
