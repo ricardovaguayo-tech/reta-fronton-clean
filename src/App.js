@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 
 const Box = ({ children, color, darkMode }) => (
@@ -7,15 +6,14 @@ const Box = ({ children, color, darkMode }) => (
       border: darkMode ? "1px solid #444" : "2px solid black",
       padding: "12px",
       borderRadius: "14px",
-      background: darkMode ? "rgba(0,0,0,0.6)" : color,
-      color: "white",
+      background: darkMode ? "rgba(0,0,0,0.5)" : color,
+      color: darkMode ? "white" : "#1d4ed8",
       minHeight: "160px",
       width: "100%",
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
       alignItems: "center",
-      backdropFilter: "blur(4px)",
     }}
   >
     {children}
@@ -200,14 +198,12 @@ export default function App() {
         maxWidth: "1100px",
         margin: "auto",
         minHeight: "100vh",
-        color: "white",
-        backgroundImage: darkMode
-          ? "url('/fronton.png')"
-          : "none",
+        color: darkMode ? "white" : "#1d4ed8",
+        backgroundImage: darkMode ? "url('/fronton.png')" : "none",
         backgroundSize: "cover",
         backgroundPosition: "center",
-        backgroundColor: darkMode ? "rgba(0,0,0,0.7)" : "white",
-        backgroundBlendMode: "darken",
+        backgroundRepeat: "no-repeat",
+        backgroundColor: darkMode ? "#000" : "white",
       }}
     >
       <h2 style={{ textAlign: "center" }}>🎾 Reta Frontón</h2>
@@ -253,12 +249,14 @@ export default function App() {
               ✅ Gana
             </button>
           </div>
+
           <h3>Equipo A</h3>
           {courts.teamA.map((p, i) => (
             <div key={i}>
               {p} <button onClick={() => removePlayer(p)}>❌</button>
             </div>
           ))}
+
           <div style={{ fontSize: 30 }}>{scoreA}</div>
           <button onClick={() => setScoreA(scoreA + 1)}>+ Punto</button>
         </Box>
@@ -270,12 +268,14 @@ export default function App() {
               ✅ Gana
             </button>
           </div>
+
           <h3>Equipo B</h3>
           {courts.teamB.map((p, i) => (
             <div key={i}>
               {p} <button onClick={() => removePlayer(p)}>❌</button>
             </div>
           ))}
+
           <div style={{ fontSize: 30 }}>{scoreB}</div>
           <button onClick={() => setScoreB(scoreB + 1)}>+ Punto</button>
         </Box>
