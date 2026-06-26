@@ -245,7 +245,52 @@ export default function App() {
 
       <h2 style={{ textAlign: "center" }}>🎾 CANCHA</h2>
 
-      {/* Equipos igual que antes */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+        <Box color="#2563eb" darkMode={darkMode}>
+          <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+            <button onClick={() => setScoreA(0)}>🔄 Reset</button>
+            <button disabled={scoreA <= scoreB} onClick={() => winner("A")}>
+              ✅ Gana
+            </button>
+          </div>
+          <h3>Equipo A</h3>
+          {courts.teamA.map((p, i) => (
+            <div key={i}>
+              {p} <button onClick={() => removePlayer(p)}>❌</button>
+            </div>
+          ))}
+          <div style={{ fontSize: 30 }}>{scoreA}</div>
+          <button onClick={() => setScoreA(scoreA + 1)}>+ Punto</button>
+        </Box>
+
+        <Box color="#dc2626" darkMode={darkMode}>
+          <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+            <button onClick={() => setScoreB(0)}>🔄 Reset</button>
+            <button disabled={scoreB <= scoreA} onClick={() => winner("B")}>
+              ✅ Gana
+            </button>
+          </div>
+          <h3>Equipo B</h3>
+          {courts.teamB.map((p, i) => (
+            <div key={i}>
+              {p} <button onClick={() => removePlayer(p)}>❌</button>
+            </div>
+          ))}
+          <div style={{ fontSize: 30 }}>{scoreB}</div>
+          <button onClick={() => setScoreB(scoreB + 1)}>+ Punto</button>
+        </Box>
+      </div>
+
+      <h3>🪑 Fila</h3>
+      {waiting.map((p, i) => (
+        <div key={i}>
+          {p} <button onClick={() => removePlayer(p)}>❌</button>
+        </div>
+      ))}
+
+      {restingTeam && (
+        <div>💤 Descansando: {restingTeam.join(", ")}</div>
+      )}
     </div>
   );
 }
