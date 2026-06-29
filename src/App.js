@@ -195,36 +195,20 @@ export default function App() {
     >
       {/* CONTROLES */}
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-        {/* TEMAS */}
         <div>
-          <button
-            onClick={() => setTheme("dark")}
-            style={{ marginRight: "10px", ...selected(theme, "dark") }}
-          >
+          <button onClick={() => setTheme("dark")} style={selected(theme, "dark")}>
             🌙 Oscuro
           </button>
-
-          <button
-            onClick={() => setTheme("light")}
-            style={selected(theme, "light")}
-          >
+          <button onClick={() => setTheme("light")} style={selected(theme, "light")}>
             ☀️ Claro
           </button>
         </div>
 
-        {/* MODOS */}
         <div>
-          <button
-            onClick={() => setMode("normal")}
-            style={{ marginRight: "10px", ...selected(mode, "normal") }}
-          >
+          <button onClick={() => setMode("normal")} style={selected(mode, "normal")}>
             🎾 Modo Normal
           </button>
-
-          <button
-            onClick={() => setMode("king")}
-            style={selected(mode, "king")}
-          >
+          <button onClick={() => setMode("king")} style={selected(mode, "king")}>
             👑 Rey de la Cancha
           </button>
         </div>
@@ -233,36 +217,18 @@ export default function App() {
       <h2 style={{ textAlign: "center" }}>🎾 Reta Frontón</h2>
       <h3>🔥 Racha: {consecutiveWins} / 2</h3>
 
-      {/* LISTA */}
-      <div>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Jugador"
-        />
-        <button style={{ marginLeft: "10px" }} onClick={addToList}>
-          Agregar
-        </button>
-
-        {savedPlayers.map((p, i) => (
-          <div key={i} style={{ marginBottom: "8px" }}>
-            <span style={{ marginRight: "12px" }}>{p}</span>
-
-            <button
-              style={{ marginRight: "10px" }}
-              onClick={() => selectPlayer(p)}
-            >
-              ➕
-            </button>
-
-            <button onClick={() => removeSavedPlayer(p)}>❌</button>
-          </div>
-        ))}
-      </div>
-
       {/* CANCHA */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
         <Box color="#2563eb">
+
+          {/* 🔥 BOTONES RESTAURADOS */}
+          <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+            <button onClick={() => setScoreA(0)}>🔄 Reset</button>
+            <button disabled={scoreA <= scoreB} onClick={() => winner("A")}>
+              ✅ Gana
+            </button>
+          </div>
+
           <h3>Equipo A</h3>
           {courts.teamA.map((p, i) => (
             <div key={i}>
@@ -272,12 +238,21 @@ export default function App() {
               </button>
             </div>
           ))}
+
           <div>{scoreA}</div>
           <button onClick={() => setScoreA(scoreA + 1)}>+ Punto</button>
-          <button onClick={() => winner("A")}>Gana</button>
         </Box>
 
         <Box color="#dc2626">
+
+          {/* 🔥 BOTONES RESTAURADOS */}
+          <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+            <button onClick={() => setScoreB(0)}>🔄 Reset</button>
+            <button disabled={scoreB <= scoreA} onClick={() => winner("B")}>
+              ✅ Gana
+            </button>
+          </div>
+
           <h3>Equipo B</h3>
           {courts.teamB.map((p, i) => (
             <div key={i}>
@@ -287,9 +262,9 @@ export default function App() {
               </button>
             </div>
           ))}
+
           <div>{scoreB}</div>
           <button onClick={() => setScoreB(scoreB + 1)}>+ Punto</button>
-          <button onClick={() => winner("B")}>Gana</button>
         </Box>
       </div>
 
