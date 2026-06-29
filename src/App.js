@@ -1,14 +1,6 @@
 import { useState, useEffect } from "react";
 
-const Box = ({ children, color }) => (
-  <div
-    style={{
-      border: "2px solid black",
-      padding: "12px",
-      borderRadius: "14px",
-      background: color,
-      color: "yellow",
-      minHeight: "160px",
+const Box = ({ minHeight: "160px",const Box = ({ children, color }) => (
       width: "100%",
       boxSizing: "border-box",
       display: "flex",
@@ -50,7 +42,6 @@ export default function App() {
     localStorage.setItem("players", JSON.stringify(savedPlayers));
   }, [savedPlayers]);
 
-  // ✅ RESTAURADO
   const addToList = () => {
     if (!name) return;
 
@@ -61,7 +52,6 @@ export default function App() {
     setName("");
   };
 
-  // ✅ RESTAURADO
   const removeSavedPlayer = (p) => {
     const updated = savedPlayers.filter((x) => x !== p);
     setSavedPlayers(updated);
@@ -127,21 +117,18 @@ export default function App() {
 
   const winner = (side) => {
     const { teamA, teamB } = courts;
+    if (teamA.length < 2 || teamB.length < 2) return;
+
     const winTeam = side === "A" ? teamA : teamB;
     const loseTeam = side === "A" ? teamB : teamA;
 
     // ✅ MODO REY
     if (mode === "king" && players.length === 6) {
       const pool = [...waiting, ...loseTeam];
-
       const challengers = pool.slice(0, 2);
       const rest = pool.slice(2);
 
-      setCourts({
-        teamA: winTeam,
-        teamB: challengers,
-      });
-
+      setCourts({ teamA: winTeam, teamB: challengers });
       setWaiting(rest);
       return;
     }
@@ -207,7 +194,34 @@ export default function App() {
 
       <h2 style={{ textAlign: "center" }}>🎾 Reta Frontón</h2>
 
-      {/* resto igual (no cambiado) */}
+      <h3>🔥 Racha: {consecutiveWins} / 2</h3>
+
+      <h2 style={{ textAlign: "center" }}>🎾 CANCHA</h2>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
+        <Box color="#2563eb">
+          <h3>Equipo A</h3>
+          {courts.teamA.map((p, i) => <div key={i}>{p}</div>)}
+          <div>{scoreA}</div>
+          <button onClick={() => setScoreA(scoreA + 1)}>+ Punto</button>
+          <button onClick={() => winner("A")}>Gana</button>
+        </Box>
+
+        <Box color="#dc2626">
+          <h3>Equipo B</h3>
+          {courts.teamB.map((p, i) => <div key={i}>{p}</div>)}
+          <div>{scoreB}</div>
+          <button onClick={() => setScoreB(scoreB + 1)}>+ Punto</button>
+          <button onClick={() => winner("B")}>Gana</button>
+        </Box>
+      </div>
     </div>
   );
 }
+  <div
+    style={{
+      border: "2px solid black",
+      padding: "12px",
+      borderRadius: "14px",
+      background: color,
+      color: "yellow",
