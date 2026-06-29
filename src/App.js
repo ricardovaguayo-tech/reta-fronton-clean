@@ -59,7 +59,6 @@ export default function App() {
 
   const selectPlayer = (p) => {
     if (players.includes(p)) return;
-
     const updated = [...players, p];
     setPlayers(updated);
 
@@ -95,9 +94,7 @@ export default function App() {
       newWaiting = newWaiting.slice(1);
     }
 
-    if (newResting && newResting.length === 0) {
-      newResting = null;
-    }
+    if (newResting && newResting.length === 0) newResting = null;
 
     setCourts({ teamA: newTeamA, teamB: newTeamB });
     setWaiting(newWaiting);
@@ -106,17 +103,14 @@ export default function App() {
 
   const addToList = () => {
     if (!name) return;
-
     if (!savedPlayers.includes(name)) {
       setSavedPlayers([...savedPlayers, name]);
     }
-
     setName("");
   };
 
   const removeSavedPlayer = (p) => {
-    const updated = savedPlayers.filter((x) => x !== p);
-    setSavedPlayers(updated);
+    setSavedPlayers(savedPlayers.filter((x) => x !== p));
     removePlayer(p);
   };
 
@@ -140,11 +134,11 @@ export default function App() {
     }
 
     if (mode === "king") {
-      const challengers = pool.slice(0, 2);
-      const rest = pool.slice(2);
-
-      setCourts({ teamA: winTeam, teamB: challengers });
-      setWaiting(rest);
+      setCourts({
+        teamA: winTeam,
+        teamB: pool.slice(0, 2),
+      });
+      setWaiting(pool.slice(2));
       resetScore();
       return;
     }
@@ -168,19 +162,20 @@ export default function App() {
       return;
     }
 
-    const filteredPool = pool.filter((p) => !winTeam.includes(p));
+    const filtered = pool.filter((p) => !winTeam.includes(p));
 
-    const challengers = filteredPool.slice(0, 2);
-    const rest = filteredPool.slice(2);
+    setCourts({
+      teamA: winTeam,
+      teamB: filtered.slice(0, 2),
+    });
 
-    setCourts({ teamA: winTeam, teamB: challengers });
-    setWaiting(rest);
+    setWaiting(filtered.slice(2));
     setCurrentChampion(winTeam);
     setConsecutiveWins(newWins);
   };
 
-  const selected = (current, value) =>
-    current === value ? { background: "#22c55e", color: "black" } : {};
+  const selected = (c, v) =>
+    c === v ? { background: "#22c55e", color: "black" } : {};
 
   return (
     <div
@@ -193,7 +188,6 @@ export default function App() {
         background: theme === "dark" ? "#111827" : "white",
       }}
     >
-      {/* CONTROLES */}
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <div>
           <button onClick={() => setTheme("dark")} style={selected(theme, "dark")}>
@@ -217,11 +211,33 @@ export default function App() {
       <h2 style={{ textAlign: "center" }}>🎾 Reta Frontón</h2>
       <h3>🔥 Racha: {consecutiveWins} / 2</h3>
 
+      {/* ✅ LISTA (ya usa todas las funciones) */}
+      <div>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Jugador"
+        />
+        <button style={{ marginLeft: 10 }} onClick={addToList}>
+          Agregar
+        </button>
+
+        {savedPlayers.map((p, i) => (
+          <div key={i} style={{ marginBottom: 8 }}>
+            <span style={{ marginRight: 12 }}>{p}</span>
+
+            <button style={{ marginRight: 8 }} onClick={() => selectPlayer(p)}>
+              ➕
+            </button>
+
+            <button onClick={() => removeSavedPlayer(p)}>❌</button>
+          </div>
+        ))}
+      </div>
+
       {/* CANCHA */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
         <Box color="#2563eb">
-
-          {/* 🔥 BOTONES RESTAURADOS */}
           <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
             <button onClick={() => setScoreA(0)}>🔄 Reset</button>
             <button disabled={scoreA <= scoreB} onClick={() => winner("A")}>
@@ -233,7 +249,7 @@ export default function App() {
           {courts.teamA.map((p, i) => (
             <div key={i}>
               {p}
-              <button style={{ marginLeft: "10px" }} onClick={() => removePlayer(p)}>
+              <button style={{ marginLeft: 10 }} onClick={() => removePlayer(p)}>
                 ❌
               </button>
             </div>
@@ -244,8 +260,6 @@ export default function App() {
         </Box>
 
         <Box color="#dc2626">
-
-          {/* 🔥 BOTONES RESTAURADOS */}
           <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
             <button onClick={() => setScoreB(0)}>🔄 Reset</button>
             <button disabled={scoreB <= scoreA} onClick={() => winner("B")}>
@@ -257,7 +271,7 @@ export default function App() {
           {courts.teamB.map((p, i) => (
             <div key={i}>
               {p}
-              <button style={{ marginLeft: "10px" }} onClick={() => removePlayer(p)}>
+              <button style={{ marginLeft: 10 }} onClick={() => removePlayer(p)}>
                 ❌
               </button>
             </div>
@@ -268,25 +282,23 @@ export default function App() {
         </Box>
       </div>
 
-      {/* FILA */}
       <h3>🪑 Fila</h3>
       {waiting.map((p, i) => (
         <div key={i}>
           {p}
-          <button style={{ marginLeft: "10px" }} onClick={() => removePlayer(p)}>
+          <button style={{ marginLeft: 10 }} onClick={() => removePlayer(p)}>
             ❌
           </button>
         </div>
       ))}
 
-      {/* DESCANSO */}
       {restingTeam && (
         <div>
           💤 Descansando:
           {restingTeam.map((p, i) => (
             <div key={i}>
               {p}
-              <button style={{ marginLeft: "10px" }} onClick={() => removePlayer(p)}>
+              <button style={{ marginLeft: 10 }} onClick={() => removePlayer(p)}>
                 ❌
               </button>
             </div>
