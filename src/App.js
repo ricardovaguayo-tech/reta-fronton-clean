@@ -139,7 +139,6 @@ export default function App() {
       setRestingTeam(null);
     }
 
-    // MODO REY
     if (mode === "king") {
       const challengers = pool.slice(0, 2);
       const rest = pool.slice(2);
@@ -150,7 +149,6 @@ export default function App() {
       return;
     }
 
-    // MODO NORMAL
     resetScore();
 
     const sameChampion =
@@ -195,24 +193,39 @@ export default function App() {
         background: theme === "dark" ? "#111827" : "white",
       }}
     >
+      {/* CONTROLES */}
       <div style={{ display: "flex", justifyContent: "space-between" }}>
+        {/* TEMAS */}
         <div>
-          <button onClick={() => setTheme("dark")} style={selected(theme, "dark")}>
-            🌙
+          <button
+            onClick={() => setTheme("dark")}
+            style={{ marginRight: "10px", ...selected(theme, "dark") }}
+          >
+            🌙 Oscuro
           </button>
 
-          <button onClick={() => setTheme("light")} style={selected(theme, "light")}>
-            ☀️
+          <button
+            onClick={() => setTheme("light")}
+            style={selected(theme, "light")}
+          >
+            ☀️ Claro
           </button>
         </div>
 
+        {/* MODOS */}
         <div>
-          <button onClick={() => setMode("normal")} style={selected(mode, "normal")}>
-            🎾
+          <button
+            onClick={() => setMode("normal")}
+            style={{ marginRight: "10px", ...selected(mode, "normal") }}
+          >
+            🎾 Modo Normal
           </button>
 
-          <button onClick={() => setMode("king")} style={selected(mode, "king")}>
-            👑
+          <button
+            onClick={() => setMode("king")}
+            style={selected(mode, "king")}
+          >
+            👑 Rey de la Cancha
           </button>
         </div>
       </div>
@@ -227,12 +240,21 @@ export default function App() {
           onChange={(e) => setName(e.target.value)}
           placeholder="Jugador"
         />
-        <button onClick={addToList}>Agregar</button>
+        <button style={{ marginLeft: "10px" }} onClick={addToList}>
+          Agregar
+        </button>
 
         {savedPlayers.map((p, i) => (
-          <div key={i}>
-            {p}
-            <button onClick={() => selectPlayer(p)}>➕</button>
+          <div key={i} style={{ marginBottom: "8px" }}>
+            <span style={{ marginRight: "12px" }}>{p}</span>
+
+            <button
+              style={{ marginRight: "10px" }}
+              onClick={() => selectPlayer(p)}
+            >
+              ➕
+            </button>
+
             <button onClick={() => removeSavedPlayer(p)}>❌</button>
           </div>
         ))}
@@ -244,7 +266,10 @@ export default function App() {
           <h3>Equipo A</h3>
           {courts.teamA.map((p, i) => (
             <div key={i}>
-              {p} <button onClick={() => removePlayer(p)}>❌</button>
+              {p}
+              <button style={{ marginLeft: "10px" }} onClick={() => removePlayer(p)}>
+                ❌
+              </button>
             </div>
           ))}
           <div>{scoreA}</div>
@@ -256,7 +281,10 @@ export default function App() {
           <h3>Equipo B</h3>
           {courts.teamB.map((p, i) => (
             <div key={i}>
-              {p} <button onClick={() => removePlayer(p)}>❌</button>
+              {p}
+              <button style={{ marginLeft: "10px" }} onClick={() => removePlayer(p)}>
+                ❌
+              </button>
             </div>
           ))}
           <div>{scoreB}</div>
@@ -269,7 +297,10 @@ export default function App() {
       <h3>🪑 Fila</h3>
       {waiting.map((p, i) => (
         <div key={i}>
-          {p} <button onClick={() => removePlayer(p)}>❌</button>
+          {p}
+          <button style={{ marginLeft: "10px" }} onClick={() => removePlayer(p)}>
+            ❌
+          </button>
         </div>
       ))}
 
@@ -279,7 +310,10 @@ export default function App() {
           💤 Descansando:
           {restingTeam.map((p, i) => (
             <div key={i}>
-              {p} <button onClick={() => removePlayer(p)}>❌</button>
+              {p}
+              <button style={{ marginLeft: "10px" }} onClick={() => removePlayer(p)}>
+                ❌
+              </button>
             </div>
           ))}
         </div>
